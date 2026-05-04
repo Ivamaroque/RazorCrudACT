@@ -1,0 +1,160 @@
+﻿@page
+@model RazorCrud_.Pages.Tarefas.IndexModel
+
+@{
+    ViewData["Title"] = "Gerenciar Tarefas";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gerenciar Tarefas</h1>
+
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+            Nova Tarefa
+        </button>
+    </div>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 80px;">ID</th>
+                <th>Título</th>
+                <th style="width: 180px;">Status</th>
+                <th style="width: 220px;">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Tarefas.Any())
+            {
+                @foreach (var tarefa in Model.Tarefas)
+                {
+                    <tr>
+                        <td>@tarefa.Id</td>
+                        <td>@tarefa.Titulo</td>
+                        <td>@tarefa.Status</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-warning btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal-@tarefa.Id">
+                                Editar
+                            </button>
+
+                            <form method="post"
+                                  asp-page-handler="Delete"
+                                  asp-route-id="@tarefa.Id"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Deseja realmente excluir esta tarefa?');">
+
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Excluir
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="editModal-@tarefa.Id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <form method="post" asp-page-handler="Edit">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Editar Tarefa</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <input type="hidden" asp-for="TarefaEditada.Id" value="@tarefa.Id" />
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Título</label>
+                                            <input asp-for="TarefaEditada.Titulo"
+                                                   value="@tarefa.Titulo"
+                                                   class="form-control" />
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select asp-for="TarefaEditada.Status" class="form-select">
+                                                <option value="Pendente" selected="@(tarefa.Status == "Pendente")">Pendente</option>
+                                                <option value="Em andamento" selected="@(tarefa.Status == "Em andamento")">Em andamento</option>
+                                                <option value="Concluída" selected="@(tarefa.Status == "Concluída")">Concluída</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+
+                                        <button type="submit" class="btn btn-success">
+                                            Salvar alterações
+                                        </button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">
+                        Nenhuma tarefa cadastrada.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post" asp-page-handler="Create">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Tarefa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input asp-for="NovaTarefa.Titulo" class="form-control" />
+                        <span asp-validation-for="NovaTarefa.Titulo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select asp-for="NovaTarefa.Status" class="form-select">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Concluída">Concluída</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Criar Tarefa
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
